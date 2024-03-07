@@ -1,25 +1,23 @@
-import { component$ } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import {
+  RequestEventBase,
+  server$,
+  type DocumentHead,
+} from "@builder.io/qwik-city";
 
-export default component$(() => {
-  return (
-    <>
-      <h1>Hi 👋</h1>
-      <p>
-        Can't wait to see what you build with qwik!
-        <br />
-        Happy coding.
-      </p>
-    </>
-  );
+const noCookies = server$(async function (
+  this: RequestEventBase<any>
+): Promise<{}> {
+  this.cookie.set("x", "x", {
+    path: "/",
+  });
+  return {};
 });
 
-export const head: DocumentHead = {
-  title: "Welcome to Qwik",
-  meta: [
-    {
-      name: "description",
-      content: "Qwik site description",
-    },
-  ],
-};
+export default component$(() => {
+  useTask$(async () => {
+    const res = await noCookies(); // cookies not set in browser
+  });
+
+  return <h1>Hi 👋</h1>;
+});
